@@ -39,13 +39,22 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   bool _showSearch = false;
-  double _iconSize = 48;
+  double _iconSize = 60;
+  int _totalicons = 0;
   List<FontAwesomeIconMetadata> searchedIconsList = [];
 
   @override
   void initState() {
     super.initState();
     searchedIconsList = faIconMetaMapping.values.toList();
+    _getTotalIcons();
+  }
+
+  void _getTotalIcons() {
+    _totalicons = 0;
+    for (FontAwesomeIconMetadata meta in searchedIconsList) {
+      _totalicons += meta.icons.length;
+    }
   }
 
   @override
@@ -60,6 +69,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     onPressed: () {
                       setState(() {
                         searchedIconsList = faIconMetaMapping.values.toList();
+                        _getTotalIcons();
                         _showSearch = false;
                       });
                     },
@@ -82,15 +92,18 @@ class _MyHomePageState extends State<MyHomePage> {
                         separatorBuilder: (context, index) => const Divider(),
                         itemCount: searchedIconsList.length,
                         itemBuilder: (context, index) {
-                          final FontAwesomeIconMetadata meta = searchedIconsList[index];
+                          final FontAwesomeIconMetadata meta =
+                              searchedIconsList[index];
                           final List<IconData> iconFamilyList = meta.icons;
                           Widget iconFamily = Container(
                               color: Colors.transparent,
                               child: OverflowBar(
                                   alignment: MainAxisAlignment.spaceEvenly,
-                                  overflowAlignment: OverflowBarAlignment.center,
+                                  overflowAlignment:
+                                      OverflowBarAlignment.center,
                                   overflowSpacing: 10,
-                                  children: iconFamilyList.map<Widget>((faicon) {
+                                  children:
+                                      iconFamilyList.map<Widget>((faicon) {
                                     return Card(
                                       margin: const EdgeInsets.all(1),
                                       child: Padding(
@@ -98,11 +111,14 @@ class _MyHomePageState extends State<MyHomePage> {
                                           child: faicon is IconDataDuotone
                                               ? FaDuotoneIcon(
                                                   faicon,
-                                                  primaryColor: Colors.red.shade600,
-                                                  secondaryColor: Colors.blue.shade600,
+                                                  primaryColor:
+                                                      Colors.red.shade600,
+                                                  secondaryColor:
+                                                      Colors.blue.shade600,
                                                   size: _iconSize,
                                                 )
-                                              : FaIcon(faicon, size: _iconSize)),
+                                              : FaIcon(faicon,
+                                                  size: _iconSize)),
                                     );
                                   }).toList()));
                           return Column(
@@ -118,26 +134,32 @@ class _MyHomePageState extends State<MyHomePage> {
                               ]);
                         }))),
             SafeArea(
-                child: Container(
-              width: double.infinity,
-              height: 40,
-              color: Colors.black,
-              child: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-                Text(
-                  "${searchedIconsList.length} icons",
-                  style: const TextStyle(color: Colors.white, fontSize: 18),
-                ),
-                Slider(
-                    min: 12,
-                    max: 130,
-                    value: _iconSize,
-                    onChanged: (value) {
-                      setState(() {
-                        _iconSize = value;
-                      });
-                    })
-              ]),
-            ))
+                child: Column(children: [
+              Slider(
+                  min: 12,
+                  max: 164,
+                  value: _iconSize,
+                  divisions: 19, //38,
+                  label: "${_iconSize.round().toString()}px",
+                  onChanged: (value) {
+                    setState(() {
+                      _iconSize = value;
+                    });
+                  }),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Text(
+                    "${searchedIconsList.length} families",
+                    style: const TextStyle(color: Colors.white, fontSize: 18),
+                  ),
+                  Text(
+                    "$_totalicons icons",
+                    style: const TextStyle(color: Colors.white, fontSize: 18),
+                  ),
+                ],
+              )
+            ]))
           ],
         ));
   }
@@ -154,6 +176,7 @@ class _MyHomePageState extends State<MyHomePage> {
           onChanged: (value) {
             setState(() {
               searchedIconsList = getIconsMetaListFromSearch(value);
+              _getTotalIcons();
             });
           },
           style: const TextStyle(color: Colors.white, fontSize: 18),
